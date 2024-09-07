@@ -1,49 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, FlatList, Alert, Image } from 'react-native';
-import { database } from './firebaseConfig';
-import { ref, onValue, push, remove } from 'firebase/database';
+import { getAuth, signOut } from "firebase/auth";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from './firebaseConfig';
 
 export default function HomeScreen({ navigation, route }) {
-  const { collectionNombre, siguientePantalla, titulo } = route.params;
+  const {collectionNombre,siguientePantalla, titulo} = route.params;
   const [pizzas, setPizzas] = useState([]);
-  const [cantidad, setContador] = useState(0);
-  const incrementarCantidad = (key) => {
-    setPizzas(pizzas.map(pizza => pizza.key === key ? { ...pizza, cantidad: pizza.cantidad + 1 } : pizza));
+  const [contador, setContador] = useState(0);
+  const incrementarCantidad = (id) => {
+    setPizzas(pizzas.map(pizza => pizza.id === id ? { ...pizza, cantidad: pizza.cantidad + 1 } : pizza));
   };
-  const decrementarCantidad = (key) => {
-    setPizzas(pizzas.map(pizza => pizza.key === key && pizza.cantidad > 0 ? { ...pizza, cantidad: pizza.cantidad - 1 } : pizza));
+  const decrementarCantidad = (id) => {
+    setPizzas(pizzas.map(pizza => pizza.id === id && pizza.cantidad > 0 ? { ...pizza, cantidad: pizza.cantidad - 1 } : pizza));
   };
 
 
   useEffect(() => {
-    const pizzasRef = ref(database, collectionNombre);
-    onValue(pizzasRef, (snapshot) => {
-      const data = snapshot.val();
-      let pizzaList = [];
-
-      if (data) {
-
-        Object.keys(data).forEach((key) => {
-          const pizza = data[key];
-          pizzaList.push({
-            key: key,
-            nombre: pizza.nombre,
-            imagen: pizza.imagen,
-            cantidad: 0,
-          });
+    const fetchPizzas = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, collectionNombre));
+        const pizzaList = [];
+        querySnapshot.forEach((doc) => {
+          pizzaList.push({ id: doc.id, ...doc.data(), cantidad: 0 });
         });
+        setPizzas(pizzaList);
+      } catch (error) {
+        console.error("Error al obtener las pizzas: ", error);
       }
-      setPizzas(pizzaList);
-    });
+    };
+
+    fetchPizzas();
   }, []);
 
   const pizzatarjeta = ({ item }) => (
-
     <View style={styles.pizzaContenedor}>
       <View>
-        <View style={styles.cantidadPizzas}>
-          <Text style={styles.textoContador}>{item.cantidad}</Text>
-        </View>
+      <View style={styles.cantidadPizzas}>
+        <Text style={styles.textoContador}>{item.cantidad}</Text>
+      </View>
       </View>
       <Text style={styles.pizzaTitulo}>{item.nombre}</Text>
       <Image
@@ -53,10 +48,10 @@ export default function HomeScreen({ navigation, route }) {
         }}
       />
       <View style={styles.botonesContenedor}>
-        <TouchableOpacity style={styles.botonSumarRestar} onPress={() => decrementarCantidad(item.key)}>
+        <TouchableOpacity style={styles.botonSumarRestar} onPress={() => decrementarCantidad(item.id)}>
           <Text style={styles.botonSumarRestarTexto}>-</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.botonSumarRestar} onPress={() => incrementarCantidad(item.key)}>
+        <TouchableOpacity style={styles.botonSumarRestar} onPress={() => incrementarCantidad(item.id)}>
           <Text style={styles.botonSumarRestarTexto}>+</Text>
         </TouchableOpacity>
       </View>
@@ -69,17 +64,17 @@ export default function HomeScreen({ navigation, route }) {
       <FlatList
         data={pizzas}
         renderItem={pizzatarjeta}
-        keyExtractor={item => item.key}
-        numColumns={2}
+        keyExtractor={item => item.id}
+        numColumns={2} 
         ListEmptyComponent={<Text>Cargando...</Text>}
       />
       <View style={styles.contenedorAtrasSiguiente}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>Atrás</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(siguientePantalla)} >
-          <Text style={styles.buttonText}>Siguiente</Text>
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
+        <Text style={styles.buttonText}>Atrás</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(siguientePantalla)} >
+        <Text style={styles.buttonText}>Siguiente</Text>
+      </TouchableOpacity>
       </View>
     </View>
   );
@@ -99,12 +94,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   pizzaContenedor: {
-    flex: 1,
-    alignItems: 'center',
-    margin: 10,
-    paddingBottom: 30,
-    borderRadius: 30,
-    backgroundColor: '#f8f8f8',
+    flex: 1, 
+    alignItems: 'center', 
+    margin: 10, 
+    paddingBottom:30,
+    borderRadius:30,
+    backgroundColor: '#f8f8f8', 
 
   },
   pizzaTitulo: {
@@ -112,7 +107,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 8,
-    marginBottom: 10,
+    marginBottom:10,
   },
   button: {
     flex: 1,
@@ -129,13 +124,13 @@ const styles = StyleSheet.create({
   imagenPizzas: {
     width: 100,
     height: 100,
-    borderRadius: 50,
+    borderRadius: 50, 
   },
   botonesContenedor: {
     flexDirection: 'row',
     marginTop: 10,
     justifyContent: 'space-between',
-    width: 100,
+    width: 100, 
   },
   botonSumarRestar: {
     backgroundColor: '#628df7',
@@ -158,16 +153,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#98f4e3',
     justifyContent: 'center',
     alignItems: 'center',
-
+    
   },
-  textoContador: {
-    fontSize: 12,
+  textoContador:{
+    fontSize : 12,
     fontWeight: 'bold'
   },
-  contenedorAtrasSiguiente: {
+  contenedorAtrasSiguiente:{
     flexDirection: 'row',
     marginTop: 10,
     justifyContent: 'space-between',
-    width: '100%',
+    width: '100%',  
   }
 });
