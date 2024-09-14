@@ -1,17 +1,21 @@
 import React from 'react';
 import PantallaAgregarGeneral from './pantallaAgregarGeneral';
-import HomeScreen from './HomeScreen';
+import { useRoute } from '@react-navigation/native';
 
 const BebidasScreen = ({ navigation }) => {
+  const route = useRoute();
+  const { allSelectedItems = {} } = route.params || {}; 
+
   return (
-    <PantallaAgregarGeneral 
-      navigation={navigation} 
-      route={{ 
-        params: { 
+    <PantallaAgregarGeneral
+      navigation={navigation}
+      route={{
+        params: {
           collectionNombre: 'bebidas',
-          siguientePantalla: 'pizzas',
-          titulo: 'Bebidas'
-        } 
+          siguientePantalla: 'DetallePedido',
+          titulo: 'Seleccionar Bebidas',
+          allSelectedItems: allSelectedItems, 
+        }
       }}
     />
   );

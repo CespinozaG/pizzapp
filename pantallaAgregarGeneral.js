@@ -6,43 +6,59 @@ import { db } from './firebaseConfig';
 
 export default function HomeScreen({ navigation, route }) {
   const {collectionNombre,siguientePantalla, titulo} = route.params;
-  const [pizzas, setPizzas] = useState([]);
-  const [contador, setContador] = useState(0);
+  const [items, setItems] = useState([]);
   const incrementarCantidad = (id) => {
-    setPizzas(pizzas.map(pizza => pizza.id === id ? { ...pizza, cantidad: pizza.cantidad + 1 } : pizza));
+    setItems(items.map(item => item.id === id ? { ...item, cantidad: item.cantidad + 1 } : item));
   };
   const decrementarCantidad = (id) => {
-    setPizzas(pizzas.map(pizza => pizza.id === id && pizza.cantidad > 0 ? { ...pizza, cantidad: pizza.cantidad - 1 } : pizza));
+    setItems(items.map(item => item.id === id && item.cantidad > 0 ? { ...item, cantidad: item.cantidad - 1 } : item));
   };
+
+const handleSiguiente = () => {
+  const selectedItems = items.filter(item => item.cantidad > 0).map(item => ({
+    ...item,
+    collection: collectionNombre, 
+  }));
+  console.log("Pedido añadido : ", selectedItems);
+  const allSelectedItems = route.params?.allSelectedItems || {};
+
+
+  allSelectedItems[collectionNombre] = selectedItems;
+
+  console.log("Pedido añadido : ", allSelectedItems);
+
+  navigation.navigate(siguientePantalla, { allSelectedItems });
+};
+
 
 
   useEffect(() => {
-    const fetchPizzas = async () => {
+    const fetchItems = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, collectionNombre));
-        const pizzaList = [];
+        const itemList = [];
         querySnapshot.forEach((doc) => {
-          pizzaList.push({ id: doc.id, ...doc.data(), cantidad: 0 });
+          itemList.push({ id: doc.id, ...doc.data(), cantidad: 0 });
         });
-        setPizzas(pizzaList);
+        setItems(itemList);
       } catch (error) {
         console.error("Error al obtener las pizzas: ", error);
       }
     };
 
-    fetchPizzas();
+    fetchItems();
   }, []);
 
-  const pizzatarjeta = ({ item }) => (
-    <View style={styles.pizzaContenedor}>
+  const itemtarjeta = ({ item }) => (
+    <View style={styles.itemContenedor}>
       <View>
-      <View style={styles.cantidadPizzas}>
+      <View style={styles.cantidadItems}>
         <Text style={styles.textoContador}>{item.cantidad}</Text>
       </View>
       </View>
-      <Text style={styles.pizzaTitulo}>{item.nombre}</Text>
+      <Text style={styles.itemTitulo}>{item.nombre}</Text>
       <Image
-        style={styles.imagenPizzas}
+        style={styles.imagenItems}
         source={{
           uri: item.imagen,
         }}
@@ -60,10 +76,10 @@ export default function HomeScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bienvenido a Pizzapp</Text>
+      <Text style={styles.title}>{titulo}</Text>
       <FlatList
-        data={pizzas}
-        renderItem={pizzatarjeta}
+        data={items}
+        renderItem={itemtarjeta}
         keyExtractor={item => item.id}
         numColumns={2} 
         ListEmptyComponent={<Text>Cargando...</Text>}
@@ -72,7 +88,7 @@ export default function HomeScreen({ navigation, route }) {
       <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
         <Text style={styles.buttonText}>Atrás</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate(siguientePantalla)} >
+      <TouchableOpacity style={styles.button} onPress={handleSiguiente}>
         <Text style={styles.buttonText}>Siguiente</Text>
       </TouchableOpacity>
       </View>
@@ -93,7 +109,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
     textAlign: 'center',
   },
-  pizzaContenedor: {
+  itemContenedor: {
     flex: 1, 
     alignItems: 'center', 
     margin: 10, 
@@ -102,7 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8', 
 
   },
-  pizzaTitulo: {
+  itemTitulo: {
     fontSize: 13,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -121,7 +137,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
   },
-  imagenPizzas: {
+  imagenItems: {
     width: 100,
     height: 100,
     borderRadius: 50, 
@@ -143,7 +159,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
-  cantidadPizzas: {
+  cantidadItems: {
     position: 'absolute',
     top: -10,
     right: -90,

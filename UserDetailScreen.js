@@ -21,11 +21,11 @@ export default function UserDetailScreen({ route, navigation }) {
             setUser(docSnap.data());
           } else {
             console.log("No se encontró el usuario!");
-            // Aquí podrías manejar el caso de usuario no encontrado
+
           }
         } catch (error) {
           console.error("Error al cargar el usuario:", error);
-          // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+
         } finally {
           setLoading(false);
         }
@@ -46,7 +46,7 @@ export default function UserDetailScreen({ route, navigation }) {
       navigation.goBack();
     } catch (error) {
       console.error("Error al guardar el usuario:", error);
-      // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ export default function UserDetailScreen({ route, navigation }) {
       }
     } catch (error) {
       console.error("Error al eliminar el usuario:", error);
-      // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+
     } finally {
       setLoading(false);
     }

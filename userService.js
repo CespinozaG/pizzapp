@@ -3,11 +3,11 @@ import { db } from './firebaseConfig';
 
 export const addUser = async (userData) => {
   try {
-    const docRef = await addDoc(collection(db, "users"), userData);
-    console.log("Usuario añadido con ID: ", docRef.id);
+    const docRef = await addDoc(collection(db, "pedidos"), userData);
+    console.log("Pedido añadido con ID: ", docRef.id);
     return docRef.id;
   } catch (e) {
-    console.error("Error añadiendo usuario: ", e);
+    console.error("Error añadiendo Pedido: ", e);
     throw e;
   }
 };
@@ -15,7 +15,7 @@ export const addUser = async (userData) => {
 export const updateUser = async (userId, userData) => {
   try {
     await updateDoc(doc(db, "users", userId), userData);
-    console.log("Usuario actualizado");
+    console.log("Pedido actualizado");
   } catch (e) {
     console.error("Error actualizando usuario: ", e);
     throw e;
@@ -24,20 +24,20 @@ export const updateUser = async (userId, userData) => {
 
 export const deleteUser = async (userId) => {
   try {
-    await deleteDoc(doc(db, "users", userId));
-    console.log("Usuario eliminado");
+    await deleteDoc(doc(db, "pedidos", userId));
+    console.log("Pedido eliminado");
   } catch (e) {
-    console.error("Error eliminando usuario: ", e);
+    console.error("Error eliminando Pedido: ", e);
     throw e;
   }
 };
 
 export const getUsers = async () => {
   try {
-    const querySnapshot = await getDocs(collection(db, "users"));
+    const querySnapshot = await getDocs(collection(db, "pedidos"));
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (e) {
-    console.error("Error obteniendo usuarios: ", e);
+    console.error("Error obteniendo pedidos: ", e);
     throw e;
   }
 };

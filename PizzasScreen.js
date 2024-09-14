@@ -4,14 +4,15 @@ import HomeScreen from './HomeScreen';
 
 const PizzasScreen = ({ navigation }) => {
   return (
-    <PantallaAgregarGeneral 
-      navigation={navigation} 
-      route={{ 
-        params: { 
+    <PantallaAgregarGeneral
+      navigation={navigation}
+      route={{
+        params: {
           collectionNombre: 'pizzas',
           siguientePantalla: 'Adicionales',
-          titulo: 'Pizzas'
-        } 
+          titulo: 'Seleccionar Pizzas',
+          allSelectedItems: {} 
+        }
       }}
     />
   );

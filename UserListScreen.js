@@ -14,13 +14,11 @@ export default function UserListScreen({ navigation }) {
       setUsers(loadedUsers);
     } catch (error) {
       console.error("Error al cargar usuarios:", error);
-      // Aquí podrías mostrar un mensaje de error al usuario
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Usar useFocusEffect para recargar la lista cada vez que la pantalla se enfoca
   useFocusEffect(
     useCallback(() => {
       loadUsers();

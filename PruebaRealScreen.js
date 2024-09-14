@@ -14,13 +14,13 @@ export default function PruebaRealScreen() {
       let taskList = [];
   
       if (data) {
-        // Convertir el objeto de tareas en un array
+        
         Object.keys(data).forEach((key) => {
           const task = data[key];
           taskList.push({
             key: key,
             title: task.title,
-            // Añadir aquí otras propiedades de la tarea si existen
+
           });
         });
       }
